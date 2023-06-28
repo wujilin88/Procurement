@@ -198,7 +198,7 @@ def start():
     for i in articleIds:
         data = crawlingDetail(i)
         returnData.append(data)
-
+    pass
     # print(returnData)
     exportExcle(returnData)
 
