@@ -177,7 +177,6 @@ def exportExcle(datas):
     # 生成表头
     for title in Excel_head:
         worksheet.write(0, title, Excel_head[title], styleCenter)
-        pass
     # 循环将值插入表格中
     for i, data in enumerate(datas):
         worksheet.write(i + 1, 0, i + 1, styleCenter)
