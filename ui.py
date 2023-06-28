@@ -51,6 +51,10 @@ class MainWindows(QMainWindow):
         self.lable1.setText("-")
         self.lable1.move(170,35)
 
+        self.pathEdit = QLineEdit(self)
+
+
+
         pass
 
 
