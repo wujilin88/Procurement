@@ -183,7 +183,6 @@ def exportExcle(datas):
         #根据字典表中的key与value进行循环遍历数据
         for key, value in dictionary.items():
             worksheet.write(i + 1, value, data[key], styleCenter)
-
     # 存储excle
     work_book.save("浙江政府采购网中标（成交）结果公告"+str(t)+".xlsx")
     #work_book.save(route + "浙江政府采购网中标（成交）结果公告" + str(t) + ".xlsx")
