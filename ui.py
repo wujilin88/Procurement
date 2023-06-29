@@ -18,7 +18,6 @@ class MainWindows(QMainWindow):
         self.initUi()
         pass
 
-
     def initUi(self):
         _ICON_PATH = 'D:\pyObject\Procurement\serch.ico'
         icon = QIcon()
