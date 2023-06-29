@@ -30,17 +30,6 @@ Url_detail = "https://zfcg.czt.zj.gov.cn/portal/detail"
 # 页面展示URL
 Url_web = "https://zfcg.czt.zj.gov.cn/luban/detail"
 
-# 预留，后面需要从页面上传过来
-request_head = {
-    "pageNo": "1",
-    "pageSize": "15",
-    "publishDateBegin": "null",
-    "publishDateEnd": "null",
-    "categoryCode": "110-188043",
-    "excludeDistrictPrefix": "90",
-    "_t": int(round(t * 1000))
-}
-
 
 # 抓取列表信息id
 def crawlingCategory(request):
@@ -161,9 +150,10 @@ def crawlingDetail(articleId):
 
 
 # 生成excle
-def exportExcle(datas):
-    dictionary = {"inviteName":1,"projectName":2,"range":3,"dt":4,"price_text":5,"supplier_text":6,"webUrl":7}
-
+def exportExcle(datas, path):
+    # 爬取数据字典
+    dictionary = {"inviteName": 1, "projectName": 2, "range": 3, "dt": 4, "price_text": 5, "supplier_text": 6,
+                  "webUrl": 7}
     work_book = xlwt.Workbook(encoding="UTF-8")
     worksheet = work_book.add_sheet("爬取数据")
 
@@ -180,26 +170,36 @@ def exportExcle(datas):
     # 循环将值插入表格中
     for i, data in enumerate(datas):
         worksheet.write(i + 1, 0, i + 1, styleCenter)
-        #根据字典表中的key与value进行循环遍历数据
+        # 根据字典表中的key与value进行循环遍历数据
         for key, value in dictionary.items():
             worksheet.write(i + 1, value, data[key], styleCenter)
 
     # 存储excle
-    work_book.save("浙江政府采购网中标（成交）结果公告"+str(t)+".xlsx")
-    #work_book.save(route + "浙江政府采购网中标（成交）结果公告" + str(t) + ".xlsx")
+    work_book.save(path)
+    # work_book.save(route + "浙江政府采购网中标（成交）结果公告" + str(t) + ".xlsx")
 
     pass
 
 
-def start():
-    returnData = []
-    articleIds = crawlingCategory(request_head)
-    for i in articleIds:
-        data = crawlingDetail(i)
-        returnData.append(data)
-    pass
-    # print(returnData)
-    exportExcle(returnData)
+def start(path, publishDateBegin, publishDateEnd, minPageNo, maxPageNo):
+    for i in range(minPageNo, maxPageNo + 1):
+        request_head = {
+            "pageNo": i,
+            "pageSize": "15",
+            "publishDateBegin": publishDateBegin,
+            "publishDateEnd": publishDateEnd,
+            "categoryCode": "110-188043",
+            "excludeDistrictPrefix": "90",
+            "_t": int(round(t * 1000))
+        }
+
+        #用于存储详情id
+        returnData = []
+        articleIds = crawlingCategory(request_head)
+        for id in articleIds:
+            data = crawlingDetail(id)
+            returnData.append(data)
+        exportExcle(returnData,path)
 
 
 # 程序停止
@@ -209,5 +209,5 @@ def stop():
 
 # 程序main开始
 if __name__ == '__main__':
-    start()
+    # start()
     pass
