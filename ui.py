@@ -96,6 +96,7 @@ class MainWindows(QMainWindow):
         self.pathEdit.setText(path + '/' + fileName)
         pass
 
+
     # 开始爬取按钮触发内容
     def startPath(self):
         path = self.pathEdit.text()
