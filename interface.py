@@ -1,5 +1,6 @@
-import requests, json, time, xlwt, warnings
+import requests, json, time, xlwt, warnings, multiprocessing
 from bs4 import BeautifulSoup
+from ui import MainWindows
 
 # 处理错误警告
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -9,7 +10,6 @@ RHeaders = {
 }
 
 t = time.time()
-
 
 # excel表头数据
 Excel_head = {
@@ -98,8 +98,6 @@ def crawlingDetail(articleId):
                 pass
 
     for bidder in bidders:
-        # price_text = []
-        # supplier_text = []
         # 价格下标
         price_index = 0
         # 供应商下标
@@ -174,15 +172,15 @@ def exportExcle(datas, path):
         # 根据字典表中的key与value进行循环遍历数据
         for key, value in dictionary.items():
             worksheet.write(i + 1, value, data[key], styleCenter)
-
     # 存储excle
     work_book.save(path)
-    # work_book.save(route + "浙江政府采购网中标（成交）结果公告" + str(t) + ".xlsx")
-
     pass
 
 
-def start(path, publishDateBegin, publishDateEnd, minPageNo, maxPageNo):
+def start(path, publishDateBegin, publishDateEnd, minPageNo, maxPageNo, callback):
+    # 用于存储详情id
+    returnData = []
+    allPages = maxPageNo - minPageNo + 1
     for i in range(minPageNo, maxPageNo + 1):
         request_head = {
             "pageNo": i,
@@ -194,13 +192,15 @@ def start(path, publishDateBegin, publishDateEnd, minPageNo, maxPageNo):
             "_t": int(round(t * 1000))
         }
 
-        #用于存储详情id
-        returnData = []
         articleIds = crawlingCategory(request_head)
-        for id in articleIds:
-            data = crawlingDetail(id)
+
+        for articleId in articleIds:
+            data = crawlingDetail(articleId)
             returnData.append(data)
-        exportExcle(returnData,path)
+        print('123')
+        callback(i + 1, allPages)
+
+        exportExcle(returnData, path)
 
 
 # 程序停止

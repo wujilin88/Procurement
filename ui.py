@@ -1,9 +1,9 @@
-import sys, json, time, crawler, os
+import sys, json, time, crawler, os, multiprocessing
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5 import QtCore, QtGui, QtWidgets
-from interface import start
+import interface
 
 
 class MainWindows(QMainWindow):
@@ -116,17 +116,36 @@ class MainWindows(QMainWindow):
         else:
             print(path, mindate, maxdate, minpage, maxpage)
             try:
-                start(path, mindate, maxdate, int(minpage), int(maxpage))
+                # 开启一个子线程
+                print('1')
+                start = multiprocessing.Process(target=self.run,
+                                                kwargs={'self': self, 'path': path, 'publishDateBegin': mindate,
+                                                        'publishDateEnd': maxdate,
+                                                        'minPageNo': int(minpage), 'maxPageNo': int(maxpage),
+                                                        }, name='Crawling')
+                # 设置守护进程，当主线程关闭时，强制关闭子线程
+                start.daemon = True
+                print('2')
+                start.start()
             except BaseException as e:
                 # print(e.args)
                 msg_box = QMessageBox(QMessageBox.Question, '【警告】', str(e.args))
                 msg_box.exec_()
 
-            self.shoInf("文件爬取成功，保存路径为：" + str(path))
+            self.showInf("文件爬取成功，保存路径为：" + str(path))
             pass
 
-    def shoInf(self, strInfo: str):
+    def run(self, path, publishDateBegin, publishDateEnd, minPageNo, maxPageNo):
+        print('3')
+        interface.start(path, publishDateBegin, publishDateEnd, minPageNo, maxPageNo, self.showInfDetails)
+        pass
+
+    def showInf(self, strInfo: str):
         self.textShow.appendPlainText(strInfo)
+
+    def showInfDetails(self, page, pages):
+        print(page, pages)
+        self.textShow.appendPlainText("已完成(" + page + "/" + pages + ")的爬取")
 
 
 # 程序入口
